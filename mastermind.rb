@@ -2,7 +2,14 @@ class Mastermind
   attr_accessor :board
   def initialize
     @board = Board.new()
+    @colors = [:red, :green, :blue, :yellow, :black, :white, :orange, :brown]
+    @secret_sequence = random_sequence
   end
+
+  def random_sequence
+    @colors.shuffle[0...4]
+  end
+
 end
 
 class Board
