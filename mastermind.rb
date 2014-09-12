@@ -1,19 +1,31 @@
 require 'colorize'
 class Mastermind
-  attr_accessor :board
+  attr_accessor :board, :game_over
   def initialize
-    @colors = [:black, :red, :green, :yellow, :blue, :magenta, :cyan, :white]
+    @colors = [:black, :red, :green, :yellow, :light_blue, :magenta, :cyan, :white]
     @board = Board.new(@colors)
     @secret_sequence = random_sequence
+    @game_over = false
+  end
+
+  def check_guess(guess)
+    if guess.chars == @secret_sequence
+      @game_over = true
+    else
+      puts "does not match "+@secret_sequence.join
+    end
+  end
+
+  def first_letters(array)
+    array.collect {|a| a[0]}
   end
 
   def random_sequence(length=4)
     # does not allow for duplicates
-    @colors.shuffle[0...length]
+    first_letters(@colors.shuffle[0...length])
     # does allow for color duplicates
     # 4.times.collect {@colors.sample}
   end
-
 end
 
 class Board
@@ -32,8 +44,10 @@ class Board
   end
 
   def possible_color_str(colors)
+    print "   "
     @colors[0...4].each {|color| print color[0].colorize(color)+" "}
     puts "\n"
+    print "   "
     @colors[4...8].each {|color| print color[0].colorize(color)+" "}
     puts "\n"
   end
@@ -53,7 +67,14 @@ end
 
 def run
   game = Mastermind.new()
-  game.board.draw
+  while !game.game_over
+    game.board.draw
+    puts "Enter a guess sequence:"
+    print ">"
+    guess = gets.chomp
+    game.check_guess(guess)
+  end
+
 
 end
 
