@@ -1,4 +1,5 @@
 require 'colorize'
+require 'set'
 class Mastermind
   attr_accessor :board, :game_over
   def initialize
@@ -10,11 +11,29 @@ class Mastermind
 
   def check_guess(guess)
     if guess.chars == @secret_sequence
+      puts "Yay!"
       @game_over = true
     else
-      puts "does not match "+@secret_sequence.join
+      check_each(guess)
     end
   end
+
+  def check_each(guess)
+    @loc_pegs = 0
+    @color_pegs = check_color_matches(guess)
+    guess.chars.each_with_index do |pin, index|
+      if pin == @secret_sequence[index]
+        # the location AND color are right
+        @loc_pegs += 1
+      end
+    end
+    @color_pegs = @color_pegs-@loc_pegs
+  end
+
+  def check_color_matches(guess)
+    (guess.chars & @secret_sequence).length
+  end
+
 
   def first_letters(array)
     array.collect {|a| a[0]}
@@ -34,6 +53,10 @@ class Board
     @bottom = "   1 2 3 4     "
     @play_space = ["  |- - - -|    "]*number_of_turns
     @colors = colors
+  end
+
+  def take_turn(turn_number, user_pegs, feedback_pegs)
+    # @play_space[turn_number] =
   end
 
   def draw
