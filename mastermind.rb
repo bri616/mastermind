@@ -7,6 +7,7 @@ class Mastermind
     @board = Board.new(@colors)
     @secret_sequence = random_sequence
     @game_over = false
+    @turn_number = 0
   end
 
   def check_guess(guess)
@@ -15,6 +16,9 @@ class Mastermind
       @game_over = true
     else
       check_each(guess)
+      puts @secret_sequence.join
+      puts "Black pegs: #{@loc_pegs}"
+      puts "White pegs: #{@color_pegs}"
     end
   end
 
@@ -28,6 +32,8 @@ class Mastermind
       end
     end
     @color_pegs = @color_pegs-@loc_pegs
+    @board.add_turn(@turn_number,guess, @color_pegs, @loc_pegs)
+    @turn_number += 1
   end
 
   def check_color_matches(guess)
@@ -51,12 +57,38 @@ class Board
   def initialize(colors, number_of_turns=10)
     @top = "  |X X X X|    "
     @bottom = "   1 2 3 4     "
-    @play_space = ["  |- - - -|    "]*number_of_turns
+    @number_of_turns = number_of_turns
+    @play_space = ["  |- - - -|    "]*@number_of_turns
     @colors = colors
   end
 
-  def take_turn(turn_number, user_pegs, feedback_pegs)
-    # @play_space[turn_number] =
+  def current_turn_line(g,f)
+    ["  |#{g[0]} #{g[1]} #{g[2]} #{g[3]}|#{f[0]}#{f[1]}#{f[2]}#{f[3]}"]
+  end
+
+  def add_turn(turn_number, user_guess, color_feedback_pegs, location_feedback_pegs)
+    @play_space[@number_of_turns - turn_number] = current_turn_line(guess_peg_strings(user_guess), feedback_strings(color_feedback_pegs, location_feedback_pegs))
+  end
+
+  def guess_peg_strings(guess)
+    guess.chars.collect {|g| "*".colorize((@colors.select {|n| n if n[0] == g})[0])}
+  end
+
+  def feedback_strings(color_pegs, location_pegs)
+    f = ["","","",""]
+    i=0
+    color_pegs.times do |n|
+      f[i] = "o".colorize(:white)
+      i += 1
+    end
+
+    location_pegs.times do |n|
+      f[i] ="o".colorize(:black)
+      i += 1
+    end
+
+    f
+
   end
 
   def draw
