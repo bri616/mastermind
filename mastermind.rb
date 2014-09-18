@@ -2,17 +2,21 @@ require 'colorize'
 require 'set'
 class Mastermind
   attr_accessor :board, :game_over
-  def initialize
+  def initialize(number_of_turns = 10)
     @colors = [:black, :red, :green, :yellow, :light_blue, :magenta, :cyan, :white]
-    @board = Board.new(@colors)
+    @board = Board.new(@colors,number_of_turns)
     @secret_sequence = random_sequence
     @game_over = false
     @turn_number = 0
+    @number_of_turns = number_of_turns
   end
 
   def check_guess(guess)
     if guess.chars == @secret_sequence
       puts "Yay!"
+      @game_over = true
+    elsif @turn_number == @number_of_turns
+      puts "YOU LOST"
       @game_over = true
     else
       check_each(guess)
